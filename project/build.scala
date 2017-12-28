@@ -34,14 +34,14 @@ import au.com.cba.omnia.humbug.HumbugSBT._
 object build extends Build {
   type Sett = Def.Setting[_]
 
-  val thermometerVersion = "1.5.10-20170501023059-67accaf"
-  val ebenezerVersion    = "0.23.13-20170710073951-5e6af7a"
-  val beeswaxVersion     = "0.1.15-20170710010323-278c3d1"
-  val omnitoolVersion    = "1.14.9-20170710003444-8f25fcd"
-  val permafrostVersion  = "0.14.9-20170710010434-5ef0d52"
-  val edgeVersion        = "3.7.7-20170712132329-f484ec1"
-  val humbugVersion      = "0.7.8-20170501020334-64f8587"
-  val parlourVersion     = "1.12.15-20170501025705-cc9de5f"
+  val thermometerVersion = "1.6.0-20180124000127-aec09bd-cdh-513"
+  val ebenezerVersion    = "0.24.0-20180124043039-314e5ab-cdh-513"
+  val beeswaxVersion     = "0.2.0-20180124040559-79287a6-cdh-513"
+  val omnitoolVersion    = "1.15.0-20180124002420-8583973-cdh-513"
+  val permafrostVersion  = "0.15.0-20180124004456-0dff960-cdh-513"
+  val edgeVersion        = "3.8.0-20180124010647-d2b7fdc-cdh-513"
+  val humbugVersion      = "0.8.0-20180124005627-cf7d6c4-cdh-513"
+  val parlourVersion     = "1.13.0-20180124004451-69a7f45-cdh-513"
 
   val scalikejdbc = noHadoop("org.scalikejdbc" %% "scalikejdbc" % "2.2.6")
     .exclude("org.joda", "joda-convert")
@@ -104,7 +104,7 @@ object build extends Build {
            depend.scalaz()
         ++ depend.hadoopClasspath
         ++ depend.hadoop()
-        ++ depend.shapeless() ++ depend.testing() ++ depend.time()
+        ++ depend.shapeless() ++ depend.testing()
         ++ depend.omnia("beeswax",       beeswaxVersion)
         ++ depend.omnia("ebenezer",      ebenezerVersion)
         ++ depend.omnia("permafrost",    permafrostVersion)
