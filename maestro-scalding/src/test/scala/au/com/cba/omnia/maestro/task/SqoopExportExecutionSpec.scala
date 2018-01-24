@@ -64,7 +64,7 @@ object SqoopExportExecutionSpec
   SqoopExecutionTest.setupEnv()
 
   def endToEndExportWithAppend = {
-    val table = s"customer_export_${UUID.randomUUID.toString.replace('-', '_')}"
+    val table = s"customer_export_${UUID.randomUUID.toString.replace('-', '_')}".toUpperCase
     tableSetup(connectionString, username, password, table, Option(oldCustomers))
 
     withEnvironment(path(resourceUrl.toString)) {
@@ -75,7 +75,7 @@ object SqoopExportExecutionSpec
   }
 
   def endToEndExportPipe = {
-    val table = s"testobj_export_${UUID.randomUUID.toString.replace('-', '_')}"
+    val table = s"testobj_export_${UUID.randomUUID.toString.replace('-', '_')}".toUpperCase
     testObjTableSetup(connectionString, username, password, table)
 
     val config = SqoopExportConfig(options(table))
@@ -85,7 +85,7 @@ object SqoopExportExecutionSpec
   }
 
   def endToEndExportWithDeleteTest = {
-    val table = s"customer_export_${UUID.randomUUID.toString.replace('-', '_')}"
+    val table = s"customer_export_${UUID.randomUUID.toString.replace('-', '_')}".toUpperCase
     tableSetup(connectionString, username, password, table, Option(oldCustomers))
 
     withEnvironment(path(resourceUrl.toString)) {
@@ -96,7 +96,7 @@ object SqoopExportExecutionSpec
   }
 
   def endToEndExportWithQuery = {
-    val table = s"customer_export_${UUID.randomUUID.toString.replace('-', '_')}"
+    val table = s"customer_export_${UUID.randomUUID.toString.replace('-', '_')}".toUpperCase
     tableSetup(connectionString, username, password, table, Option(oldCustomers))
 
     withEnvironment(path(resourceUrl.toString)) {
@@ -115,7 +115,7 @@ object SqoopExportExecutionSpec
 
   def endToEndExportWithTeradataConnMan = {
     SqoopExecutionTest.setupEnv()
-    val table = s"customer_export_${UUID.randomUUID.toString.replace('-', '_')}"
+    val table = s"customer_export_${UUID.randomUUID.toString.replace('-', '_')}".toUpperCase
     tableSetup(connectionString, username, password, table, Option(List()))
 
     withEnvironment(path(resourceUrl.toString)) {
@@ -126,7 +126,7 @@ object SqoopExportExecutionSpec
 
   def endToEndExportWithTeradataResetConnMan = {
     SqoopExecutionTest.setupEnv(customConnMan=Some(""))
-    val table = s"customer_export_${UUID.randomUUID.toString.replace('-', '_')}"
+    val table = s"customer_export_${UUID.randomUUID.toString.replace('-', '_')}".toUpperCase
     tableSetup(connectionString, username, password, table, Option(List()))
 
     withEnvironment(path(resourceUrl.toString)) {
