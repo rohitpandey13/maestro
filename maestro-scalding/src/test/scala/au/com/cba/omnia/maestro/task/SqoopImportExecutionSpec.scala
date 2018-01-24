@@ -54,7 +54,7 @@ object SqoopImportExecutionSpec
   val password         = ""
   val hdfsRoot         = s"$dir/user/hdfs"
   val mapRedHome       = s"${System.getProperty("user.home")}/.ivy2/cache"
-  val importTableName  = s"customer_import_${UUID.randomUUID.toString.replace('-', '_')}"
+  val importTableName  = s"customer_import_${UUID.randomUUID.toString.replace('-', '_')}".toUpperCase
   val dirStructure     = s"sales/books/$importTableName"
   val hdfsLandingPath  = s"$hdfsRoot/source/$dirStructure"
   val hdfsArchivePath  = s"$hdfsRoot/archive/$dirStructure"
