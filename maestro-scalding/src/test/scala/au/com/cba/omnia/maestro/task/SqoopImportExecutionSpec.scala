@@ -62,7 +62,7 @@ object SqoopImportExecutionSpec
 
   val options = SqoopImportConfig.options[ParlourImportDsl](
     connectionString, username, password, importTableName
-  ).splitBy("id")
+  ).splitBy("ID")
 
   Class.forName("org.hsqldb.jdbcDriver")
 
@@ -83,8 +83,8 @@ object SqoopImportExecutionSpec
     val (path, count) = executesSuccessfully(sqoopImport(config))
     facts(
       ImportPathFact(path),
-      s"$hdfsLandingPath/$timePath" </> "part-m-00000"  ==> lines(data),
-      s"$hdfsArchivePath/$timePath" </> "part-00000.gz" ==> records(compressedRecordReader, data)
+      s"$hdfsLandingPath/$timePath" </> "part-m-*"  ==> lines(data),
+      s"$hdfsArchivePath/$timePath" </> "part-*.gz" ==> records(compressedRecordReader, data)
     )
     count must_== 3
   }
@@ -97,9 +97,9 @@ object SqoopImportExecutionSpec
     val (path, count) = executesSuccessfully(sqoopImport(config))
     facts(
       ImportPathFact(path),
-      s"$dir/user/hdfs/archive/sales/books" </> importTableName </> "2014/10/10" </> "part-00000.gz" ==>
+      s"$dir/user/hdfs/archive/sales/books" </> importTableName </> "2014/10/10" </> "part-*.gz" ==>
         records(compressedRecordReader, data),
-      s"$dir/user/hdfs/source/sales/books"  </> importTableName </> "2014/10/10" </> "part-m-00000"  ==>
+      s"$dir/user/hdfs/source/sales/books"  </> importTableName </> "2014/10/10" </> "part-m-*"  ==>
         lines(data)
     )
     count must_== 3
@@ -119,7 +119,7 @@ object SqoopImportExecutionSpec
 
   val teradataOptions = SqoopImportConfig.options[TeradataParlourImportDsl](
     connectionString, username, password, importTableName
-  ).splitBy("id")
+  ).splitBy("ID")
 
   def endToEndImportWithTeradataConnMan = {
     SqoopExecutionTest.setupEnv()
@@ -133,8 +133,8 @@ object SqoopImportExecutionSpec
     val (path, count) = executesSuccessfully(sqoopImport(config))
     facts(
       ImportPathFact(path),
-      s"$hdfsLandingPath/$timePath" </> "part-m-00000"  ==> lines(data),
-      s"$hdfsArchivePath/$timePath" </> "part-00000.gz" ==> records(compressedRecordReader, data)
+      s"$hdfsLandingPath/$timePath" </> "part-m-*"  ==> lines(data),
+      s"$hdfsArchivePath/$timePath" </> "part-*.gz" ==> records(compressedRecordReader, data)
     )
     count must_== 3
   }
@@ -171,8 +171,8 @@ object SqoopImportExecutionSpec
 
     executesSuccessfully(execution) must_==((3, 3))
     facts(
-      s"$hdfsLandingPath/$timePath"  </> "part-m-00000" ==> lines(data),
-      s"$hdfsLandingPath2/$timePath" </> "part-m-00000" ==> lines(data2)
+      s"$hdfsLandingPath/$timePath"  </> "part-m-*" ==> lines(data),
+      s"$hdfsLandingPath2/$timePath" </> "part-m-*" ==> lines(data2)
     )
   }
 

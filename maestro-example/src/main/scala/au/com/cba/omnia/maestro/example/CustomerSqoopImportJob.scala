@@ -27,10 +27,10 @@ case class CustomerImportConfig(config: Config) {
     conf          = config,
     source        = "sales",
     domain        = "books",
-    tablename     = "customer_import"
+    tablename     = "CUSTOMER_IMPORT"
   )
   val sqoopImport  = maestro.sqoopImport(
-    initialOptions = Some(ParlourImportDsl().splitBy("id").hiveDropImportDelims)
+    initialOptions = Some(ParlourImportDsl().splitBy("ID").hiveDropImportDelims)
   )
   val load        = maestro.load[Customer](
     none          = "null"

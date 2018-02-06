@@ -32,7 +32,7 @@ case class CustomerExportConfig(config: Config) {
   val upload    = maestro.upload()
   val load      = maestro.load[Customer](none = "null")
   val export     = maestro.sqoopExport[ParlourExportDsl](
-    dbTablename  = "customer_export"
+    dbTablename  = "CUSTOMER_EXPORT"
   )
 }
 
