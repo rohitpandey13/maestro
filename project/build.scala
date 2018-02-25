@@ -40,7 +40,7 @@ object build extends Build {
   val omnitoolVersion    = "1.15.0-20180124002420-8583973-cdh-513"
   val permafrostVersion  = "0.15.0-20180124004456-0dff960-cdh-513"
   val edgeVersion        = "3.8.0-20180124010647-d2b7fdc-cdh-513"
-  val humbugVersion      = "0.8.0-20180124005627-cf7d6c4-cdh-513"
+  val humbugVersion      = "0.8.1-20180225135322-2b1c6b8-cdh-513"
   val parlourVersion     = "1.13.0-20180124004451-69a7f45-cdh-513"
 
   val scalikejdbc = noHadoop("org.scalikejdbc" %% "scalikejdbc" % "2.2.6")
