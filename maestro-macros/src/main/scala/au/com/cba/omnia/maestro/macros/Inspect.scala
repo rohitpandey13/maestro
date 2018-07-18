@@ -16,8 +16,6 @@ package au.com.cba.omnia.maestro.macros
 
 import scala.reflect.macros.whitebox.Context
 
-import org.apache.commons.lang.WordUtils
-
 import com.twitter.scrooge.ThriftStruct
 
 import au.com.cba.omnia.humbug.HumbugThriftStruct

@@ -18,8 +18,6 @@ import scala.reflect.macros.whitebox.Context
 
 import com.twitter.scrooge._
 
-import au.com.cba.omnia.humbug.HumbugThriftStruct
-
 import au.com.cba.omnia.maestro.core.codec._
 
 /** Creates a custom Decode for the given thrift struct. */

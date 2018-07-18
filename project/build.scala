@@ -34,7 +34,7 @@ import au.com.cba.omnia.humbug.HumbugSBT._
 object build extends Build {
   type Sett = Def.Setting[_]
 
-  val thermometerVersion = "1.6.3-20180313095616-1002630-cdh-513"
+  val thermometerVersion = "1.6.4-20180718072918-07b430a-cdh-513"
   val ebenezerVersion    = "0.24.2-20180313105312-7774558-cdh-513"
   val beeswaxVersion     = "0.2.4-20180313102045-77c98de-cdh-513"
   val omnitoolVersion    = "1.15.3-20180313095619-4dcc61a-cdh-513"
@@ -98,8 +98,8 @@ object build extends Build {
     ++ uniform.project("maestro-core", "au.com.cba.omnia.maestro.core")
     ++ humbugSettings
     ++ Seq[Sett](
-      scroogeThriftSourceFolder in Test <<= (sourceDirectory) { _ / "test" / "thrift" / "scrooge" },
-      humbugThriftSourceFolder in Test <<= (sourceDirectory) { _ / "test" / "thrift" / "humbug" },
+      scroogeThriftSourceFolder in Test := sourceDirectory.value / "test" / "thrift" / "scrooge",
+      humbugThriftSourceFolder in Test := sourceDirectory.value / "test" / "thrift" / "humbug",
       libraryDependencies ++=
            depend.scalaz()
         ++ depend.hadoopClasspath
@@ -133,9 +133,9 @@ object build extends Build {
        standardSettings
     ++ uniform.project("maestro-macros", "au.com.cba.omnia.maestro.macros")
     ++ Seq[Sett](
-         libraryDependencies <++= scalaVersion.apply(sv => Seq(
-           "org.scala-lang" % "scala-reflect" % sv
-         ) ++ depend.testing())
+         libraryDependencies ++= Seq(
+           "org.scala-lang" % "scala-reflect" % scalaVersion.value
+         ) ++ depend.testing()
        , addCompilerPlugin(depend.macroParadise())
     )
   ).dependsOn(core)
@@ -172,12 +172,12 @@ object build extends Build {
     ++ uniform.project("maestro-schema", "au.com.cba.omnia.maestro.schema")
     ++ uniformAssemblySettings
     ++ Seq[Sett](
-          libraryDependencies <++= scalaVersion.apply(sv => Seq(
+          libraryDependencies ++= Seq(
             "com.quantifind"         %% "sumac"                    % "0.3.0"
-          , "org.scala-lang"         %  "scala-reflect"            % sv
+          , "org.scala-lang"         %  "scala-reflect"            % scalaVersion.value
           , "org.apache.commons"     %  "commons-lang3"            % "3.1"
           , "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4"
-          ) ++ depend.scalding() ++ depend.hadoopClasspath ++ depend.hadoop())
+          ) ++ depend.scalding() ++ depend.hadoopClasspath ++ depend.hadoop()
        )
     )
 
@@ -232,8 +232,8 @@ object build extends Build {
     ++ uniformThriftSettings
     ++ humbugSettings
     ++ Seq[Sett](
-         scroogeThriftSourceFolder in Compile <<= (sourceDirectory) { _ / "main" / "thrift" / "scrooge" }
-       , humbugThriftSourceFolder  in Compile <<= (sourceDirectory) { _ / "main" / "thrift" / "humbug" }
+         scroogeThriftSourceFolder in Compile := sourceDirectory.value / "main" / "thrift" / "scrooge"
+       , humbugThriftSourceFolder  in Compile := sourceDirectory.value / "main" / "thrift" / "humbug"
        , libraryDependencies ++=
            depend.omnia("ebenezer-test",    ebenezerVersion)
            ++ depend.omnia("thermometer-hive", thermometerVersion)
