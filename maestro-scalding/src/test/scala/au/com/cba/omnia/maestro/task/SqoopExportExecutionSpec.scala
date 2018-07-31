@@ -21,14 +21,13 @@ import scala.io.Source
 
 import scalikejdbc.{SQL, ConnectionPool, AutoSession}
 
-import com.twitter.scalding.{TextLine, TypedPipe}
+import com.twitter.scalding.TypedPipe
 
 import au.com.cba.omnia.parlour.SqoopSyntax.{ParlourExportDsl, TeradataParlourExportDsl}
 
 import au.com.cba.omnia.thermometer.core.Thermometer._
 import au.com.cba.omnia.thermometer.core.ThermometerSpec
 
-import au.com.cba.omnia.maestro.core.split.Splitter
 import au.com.cba.omnia.maestro.core.codec.Encode
 import au.com.cba.omnia.maestro.core.thrift.humbug.Exhaustive
 

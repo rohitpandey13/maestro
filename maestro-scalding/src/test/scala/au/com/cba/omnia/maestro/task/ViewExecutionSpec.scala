@@ -16,7 +16,7 @@ package au.com.cba.omnia.maestro.task
 
 import scalaz.Scalaz._
 
-import com.twitter.scalding.{Execution, TypedPipe, TypedCsv}
+import com.twitter.scalding.{Execution, TypedCsv}
 import com.twitter.scalding.TDsl._
 
 import org.specs2.matcher.Matcher
@@ -33,11 +33,11 @@ import au.com.cba.omnia.ebenezer.test.ParquetThermometerRecordReader
 
 import au.com.cba.omnia.beeswax.Hive
 
-import au.com.cba.omnia.omnitool.{Result, Ok, Error}
+import au.com.cba.omnia.omnitool.Result
 
 import au.com.cba.omnia.maestro.core.data.Field
 import au.com.cba.omnia.maestro.core.partition.Partition
-import au.com.cba.omnia.maestro.hive.{GenericPartitionedHiveTable, HiveTable, UnpartitionedHiveTable}
+import au.com.cba.omnia.maestro.hive.{GenericPartitionedHiveTable, HiveTable}
 import au.com.cba.omnia.maestro.scalding.ExecutionOps._
 import au.com.cba.omnia.maestro.core.thrift.scrooge.StringPair
 

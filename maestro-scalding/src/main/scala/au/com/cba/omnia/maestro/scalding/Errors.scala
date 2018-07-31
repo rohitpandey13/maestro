@@ -14,9 +14,6 @@
 
 package au.com.cba.omnia.maestro.scalding
 
-import cascading.flow.FlowDef
-import cascading.pipe.Pipe
-
 import com.twitter.scalding.{FieldConversions, Source, TypedPipe, TypedPsv}
 import com.twitter.scalding.typed.TypedSink
 

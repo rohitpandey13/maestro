@@ -1,7 +1,5 @@
 package au.com.cba.omnia.maestro.core.upload
 
-import scalaz.\/-
-
 import au.com.cba.omnia.thermometer.core.ThermometerSpec
 
 import au.com.cba.omnia.omnitool.{Error, Result}

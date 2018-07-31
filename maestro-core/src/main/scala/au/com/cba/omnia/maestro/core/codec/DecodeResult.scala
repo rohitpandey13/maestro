@@ -14,11 +14,7 @@
 
 package au.com.cba.omnia.maestro.core.codec
 
-import scala.util.control.NonFatal
-
 import scalaz._, Scalaz._, \&/._
-
-import shapeless.{ProductTypeClass, TypeClassCompanion}
 
 sealed trait Reason
 case class ParseError(value: String, expected: String, error: These[String, Throwable]) extends Reason

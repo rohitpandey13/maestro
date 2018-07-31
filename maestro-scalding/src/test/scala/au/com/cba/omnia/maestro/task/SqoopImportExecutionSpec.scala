@@ -25,8 +25,6 @@ import scalikejdbc.{SQL, AutoSession, ConnectionPool}
 
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 
-import org.specs2.specification.BeforeEach
-
 import au.com.cba.omnia.parlour.SqoopSyntax.{ParlourImportDsl,TeradataParlourImportDsl}
 
 import au.com.cba.omnia.thermometer.fact.Fact

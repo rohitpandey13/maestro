@@ -15,7 +15,7 @@
 package au.com.cba.omnia.maestro.core
 package hdfs
 
-import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.hadoop.fs.Path
 
 import scalaz._, Scalaz._
 

@@ -14,11 +14,9 @@
 
 package au.com.cba.omnia.maestro.task
 
-import java.sql.Timestamp
-
 import scala.util.matching.Regex
 
-import org.joda.time.{DateTime, DateTimeZone}
+import org.joda.time.DateTime
 
 import scalaz.Monoid
 
@@ -26,8 +24,7 @@ import cascading.scheme.local.TextLine
 
 import com.twitter.scrooge.ThriftStruct
 
-import com.twitter.scalding.{Args, Config, Mode, TupleSetter}
-import com.twitter.scalding.typed.TypedPipe
+import com.twitter.scalding.{Config, TupleSetter}
 
 import au.com.cba.omnia.parlour.{ParlourExportOptions, ParlourImportOptions}
 

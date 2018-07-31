@@ -17,8 +17,6 @@ package split
 
 import org.scalacheck.{Gen, Prop}
 
-import au.com.cba.omnia.maestro.core.split
-
 object SplitterSpec extends test.Spec { def is = s2"""
 
 Splitter properties

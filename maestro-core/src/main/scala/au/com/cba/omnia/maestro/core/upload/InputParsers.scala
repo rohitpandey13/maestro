@@ -14,8 +14,6 @@
 
 package au.com.cba.omnia.maestro.core.upload
 
-import scala.util.control.NonFatal
-
 import scala.util.parsing.combinator.Parsers
 import scala.util.parsing.input.CharSequenceReader
 
