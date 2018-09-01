@@ -1,4 +1,4 @@
-//   Copyright 2014 Commonwealth Bank of Australia
+//   Copyright 2014-2018 Commonwealth Bank of Australia
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -34,18 +34,14 @@ import au.com.cba.omnia.humbug.HumbugSBT._
 object build extends Build {
   type Sett = Def.Setting[_]
 
-  val thermometerVersion = "1.6.5-20180807042910-ed508c9-cdh-513"
-  val ebenezerVersion    = "0.24.4-20180813093744-eee3cab-cdh-513"
-  val beeswaxVersion     = "0.2.4-20180313102045-77c98de-cdh-513"
-  val omnitoolVersion    = "1.15.3-20180313095619-4dcc61a-cdh-513"
-  val permafrostVersion  = "0.15.3-20180313102028-e96ac27-cdh-513"
-  val edgeVersion        = "3.8.3-20180313105358-b15df6f-cdh-513"
-  val humbugVersion      = "0.8.3-20180313100441-fd2853d-cdh-513"
-  val parlourVersion     = "1.13.3-20180313102208-dd3829e-cdh-513"
-
-  val scalikejdbc = noHadoop("org.scalikejdbc" %% "scalikejdbc" % "2.2.6")
-    .exclude("org.joda", "joda-convert")
-    .exclude("org.scala-lang.modules", "scala-parser-combinators_2.11")
+  val thermometerVersion = "1.6.7-20180901040333-56b8c34-cdh-513"
+  val ebenezerVersion    = "0.24.5-20180901053047-71d6efb-cdh-513"
+  val beeswaxVersion     = "0.2.5-20180901043934-f594f39-cdh-513"
+  val omnitoolVersion    = "1.15.4-20180901034024-3937ac5-cdh-513"
+  val permafrostVersion  = "0.15.4-20180901050904-f0531e4-cdh-513"
+  val edgeVersion        = "3.8.4-20180901053021-55da0b6-cdh-513"
+  val humbugVersion      = "0.8.4-20180901021838-a0f2a99-cdh-513"
+  val parlourVersion     = "1.13.4-20180901050111-8a97b68-cdh-513"
 
   lazy val standardSettings: Seq[Sett] =
     Defaults.coreDefaultSettings ++
@@ -107,18 +103,16 @@ object build extends Build {
         ++ depend.shapeless() ++ depend.testing()
         ++ depend.omnia("beeswax",       beeswaxVersion)
         ++ depend.omnia("ebenezer",      ebenezerVersion)
+        ++ depend.omnia("ebenezer-test", ebenezerVersion, "test")
         ++ depend.omnia("permafrost",    permafrostVersion)
         ++ depend.omnia("edge",          edgeVersion)
         ++ depend.omnia("humbug-core",   humbugVersion)
         ++ depend.omnia("omnitool-time", omnitoolVersion)
         ++ depend.omnia("omnitool-file", omnitoolVersion)
         ++ depend.omnia("parlour",       parlourVersion)
+        ++ depend.scalikejdbc()
         ++ Seq(
           noHadoop("commons-validator"  % "commons-validator" % "1.4.0"),
-          "org.specs2"                 %% "specs2-matcher-extra" % "3.5" % "test"
-            exclude("org.scala-lang", "scala-compiler"),
-          "au.com.cba.omnia"           %% "ebenezer-test"     % ebenezerVersion        % "test",
-          scalikejdbc                                                                  % "test",
           "com.opencsv"                 % "opencsv"           % "3.3"
             exclude ("org.apache.commons", "commons-lang3") // conflicts with hive
         ),
@@ -156,10 +150,8 @@ object build extends Build {
         ++ depend.hadoop()
         ++ depend.parquet()
         ++ depend.testing()
-        ++ Seq(
-          "au.com.cba.omnia" %% "thermometer-hive" % thermometerVersion % "test"
-        ),
-      dependencyOverrides += "org.scalacheck" %% "scalacheck" % "1.11.4",
+        ++ depend.omnia("omnitool-core", omnitoolVersion, "test").map(_ classifier "tests")
+        ++ depend.omnia("thermometer-hive", thermometerVersion, "test"),
       parallelExecution in Test := false
     )
   ).dependsOn(core % "compile->compile;test->test")
@@ -176,7 +168,6 @@ object build extends Build {
             "com.quantifind"         %% "sumac"                    % "0.3.0"
           , "org.scala-lang"         %  "scala-reflect"            % scalaVersion.value
           , "org.apache.commons"     %  "commons-lang3"            % "3.1"
-          , "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4"
           ) ++ depend.scalding() ++ depend.hadoopClasspath ++ depend.hadoop()
        )
     )
@@ -190,9 +181,8 @@ object build extends Build {
     ++ uniformAssemblySettings
     ++ uniformThriftSettings
     ++ Seq[Sett](
-         libraryDependencies ++= depend.hadoopClasspath ++ depend.hadoop() ++ depend.parquet() ++ Seq(
-           scalikejdbc % "test"
-         )
+         libraryDependencies ++= depend.hadoopClasspath ++ depend.hadoop() ++ depend.parquet() ++
+           depend.scalikejdbc().map(_ % "test")
        , parallelExecution in Test := false
        , sources in doc in Compile := List()
        , addCompilerPlugin(depend.macroParadise())
