@@ -34,14 +34,14 @@ import au.com.cba.omnia.humbug.HumbugSBT._
 object build extends Build {
   type Sett = Def.Setting[_]
 
-  val thermometerVersion = "1.6.7-20180901040333-56b8c34-cdh-513"
-  val ebenezerVersion    = "0.24.5-20180901053047-71d6efb-cdh-513"
-  val beeswaxVersion     = "0.2.5-20180901043934-f594f39-cdh-513"
-  val omnitoolVersion    = "1.15.4-20180901034024-3937ac5-cdh-513"
-  val permafrostVersion  = "0.15.4-20180901050904-f0531e4-cdh-513"
-  val edgeVersion        = "3.8.4-20180901053021-55da0b6-cdh-513"
-  val humbugVersion      = "0.8.4-20180901021838-a0f2a99-cdh-513"
-  val parlourVersion     = "1.13.4-20180901050111-8a97b68-cdh-513"
+  val thermometerVersion = "1.6.8-20180902221010-340e9f0-cdh-513"
+  val ebenezerVersion    = "0.24.6-20180902222216-25664f3-cdh-513"
+  val beeswaxVersion     = "0.2.6-20180902221513-7fbeea0-cdh-513"
+  val omnitoolVersion    = "1.15.5-20180902220853-3c0c662-cdh-513"
+  val permafrostVersion  = "0.15.5-20180902221604-197d427-cdh-513"
+  val edgeVersion        = "3.8.5-20180902222046-9799421-cdh-513"
+  val humbugVersion      = "0.8.5-20180902220320-7510210-cdh-513"
+  val parlourVersion     = "1.13.5-20180902221709-f2994ed-cdh-513"
 
   lazy val standardSettings: Seq[Sett] =
     Defaults.coreDefaultSettings ++
@@ -182,7 +182,7 @@ object build extends Build {
     ++ uniformThriftSettings
     ++ Seq[Sett](
          libraryDependencies ++= depend.hadoopClasspath ++ depend.hadoop() ++ depend.parquet() ++
-           depend.scalikejdbc().map(_ % "test")
+           depend.scalikejdbc().map(_.copy(configurations = Some("test")))
        , parallelExecution in Test := false
        , sources in doc in Compile := List()
        , addCompilerPlugin(depend.macroParadise())
@@ -226,7 +226,6 @@ object build extends Build {
        , humbugThriftSourceFolder  in Compile := sourceDirectory.value / "main" / "thrift" / "humbug"
        , libraryDependencies ++=
            depend.omnia("ebenezer-test",    ebenezerVersion)
-           ++ depend.omnia("thermometer-hive", thermometerVersion)
            ++ depend.hadoopClasspath ++ depend.hadoop()
            ++ depend.testing(configuration = "test")
     )
