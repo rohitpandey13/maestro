@@ -1,5 +1,0 @@
-H|header
-D|oneA
-D|oneB
-D|oneC
-T|trailer

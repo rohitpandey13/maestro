@@ -1,5 +1,0 @@
-oneA
-oneB
-oneC
-oneD
-error1|error2
