@@ -21,21 +21,14 @@ import scala.util.Random
 import com.twitter.scalding.Execution
 import com.twitter.scalding.typed.TypedPipe
 
-import cascading.tap.hadoop.HfsProps
-
-import au.com.cba.omnia.beeswax.Hive
 import au.com.cba.omnia.ebenezer.ParquetLogging
 
 import au.com.cba.omnia.thermometer.core.Thermometer._
 import au.com.cba.omnia.thermometer.fact.Fact
 import au.com.cba.omnia.thermometer.hive.ThermometerHiveSpec
 
-import au.com.cba.omnia.maestro.core.clean.Clean
-import au.com.cba.omnia.maestro.core.filter.RowFilter
 import au.com.cba.omnia.maestro.core.partition.Partition
-import au.com.cba.omnia.maestro.core.split.Splitter
 import au.com.cba.omnia.maestro.core.time.TimeSource
-import au.com.cba.omnia.maestro.core.validate.Validator
 import au.com.cba.omnia.maestro.hive.HiveTable
 
 import au.com.cba.omnia.maestro.core.thrift.scrooge.StringPair

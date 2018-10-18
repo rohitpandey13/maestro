@@ -14,9 +14,6 @@
 package au.com.cba.omnia.maestro.schema
 package commands
 
-import scala.io.Source
-import scala.util.parsing.json.{JSON}
-
 import com.quantifind.sumac.ArgMain
 import com.quantifind.sumac.validation._
 import com.quantifind.sumac.FieldArgs

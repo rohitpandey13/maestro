@@ -16,9 +16,7 @@ package au.com.cba.omnia.maestro.schema
 
 import scala.io.Source
 
-import scala.util.parsing.combinator.Parsers
-import scala.util.parsing.input.{NoPosition, Position, Reader}
-import scala.util.parsing.json.{JSON}
+import scala.util.parsing.json.JSON
 
 import au.com.cba.omnia.maestro.schema.SchemaParser._
 

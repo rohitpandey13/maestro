@@ -1,7 +1,6 @@
 
 package au.com.cba.omnia.maestro.schema
 package pretty
-import scala.util.parsing.json.{JSON}
 import org.apache.commons.lang3.StringEscapeUtils
 
 /** Abstract Json documents */

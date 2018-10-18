@@ -1,4 +1,4 @@
-//   Copyright 2014 Commonwealth Bank of Australia
+//   Copyright 2014-2018 Commonwealth Bank of Australia
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -34,18 +34,14 @@ import au.com.cba.omnia.humbug.HumbugSBT._
 object build extends Build {
   type Sett = Def.Setting[_]
 
-  val thermometerVersion = "1.5.12-20180302071430-ad04a11"
-  val ebenezerVersion    = "0.23.14-20180302103427-e23e6bd"
-  val beeswaxVersion     = "0.1.16-20180302092151-110891c"
-  val omnitoolVersion    = "1.14.11-20180302081936-53ddf0e"
-  val permafrostVersion  = "0.14.11-20180302092106-7f90bbd"
-  val edgeVersion        = "3.7.9-20180302102541-ca11930"
-  val humbugVersion      = "0.7.10-20180302071537-99dc9d3"
-  val parlourVersion     = "1.12.18-20181009030316-0a885ba"
-
-  val scalikejdbc = noHadoop("org.scalikejdbc" %% "scalikejdbc" % "2.2.6")
-    .exclude("org.joda", "joda-convert")
-    .exclude("org.scala-lang.modules", "scala-parser-combinators_2.11")
+  val thermometerVersion = "1.6.9-20181018060930-b772548"
+  val ebenezerVersion    = "0.24.7-20181018101621-01c6c4e"
+  val beeswaxVersion     = "0.2.8-20181018094106-acfac52"
+  val omnitoolVersion    = "1.15.7-20181018075855-52b83f2"
+  val permafrostVersion  = "0.15.7-20181018094021-b7cc383"
+  val edgeVersion        = "3.8.7-20181018101154-c430468"
+  val humbugVersion      = "0.8.6-20181018060744-194b719"
+  val parlourVersion     = "1.13.7-20181018064500-8e684f3"
 
   lazy val standardSettings: Seq[Sett] =
     Defaults.coreDefaultSettings ++
@@ -98,27 +94,25 @@ object build extends Build {
     ++ uniform.project("maestro-core", "au.com.cba.omnia.maestro.core")
     ++ humbugSettings
     ++ Seq[Sett](
-      scroogeThriftSourceFolder in Test <<= (sourceDirectory) { _ / "test" / "thrift" / "scrooge" },
-      humbugThriftSourceFolder in Test <<= (sourceDirectory) { _ / "test" / "thrift" / "humbug" },
+      scroogeThriftSourceFolder in Test := sourceDirectory.value / "test" / "thrift" / "scrooge",
+      humbugThriftSourceFolder in Test := sourceDirectory.value / "test" / "thrift" / "humbug",
       libraryDependencies ++=
            depend.scalaz()
         ++ depend.hadoopClasspath
         ++ depend.hadoop()
-        ++ depend.shapeless() ++ depend.testing() ++ depend.time()
+        ++ depend.shapeless() ++ depend.testing()
         ++ depend.omnia("beeswax",       beeswaxVersion)
         ++ depend.omnia("ebenezer",      ebenezerVersion)
+        ++ depend.omnia("ebenezer-test", ebenezerVersion, "test")
         ++ depend.omnia("permafrost",    permafrostVersion)
         ++ depend.omnia("edge",          edgeVersion)
         ++ depend.omnia("humbug-core",   humbugVersion)
         ++ depend.omnia("omnitool-time", omnitoolVersion)
         ++ depend.omnia("omnitool-file", omnitoolVersion)
         ++ depend.omnia("parlour",       parlourVersion)
+        ++ depend.scalikejdbc()
         ++ Seq(
           noHadoop("commons-validator"  % "commons-validator" % "1.4.0"),
-          "org.specs2"                 %% "specs2-matcher-extra" % "3.5" % "test"
-            exclude("org.scala-lang", "scala-compiler"),
-          "au.com.cba.omnia"           %% "ebenezer-test"     % ebenezerVersion        % "test",
-          scalikejdbc                                                                  % "test",
           "com.opencsv"                 % "opencsv"           % "3.3"
             exclude ("org.apache.commons", "commons-lang3") // conflicts with hive
         ),
@@ -133,9 +127,9 @@ object build extends Build {
        standardSettings
     ++ uniform.project("maestro-macros", "au.com.cba.omnia.maestro.macros")
     ++ Seq[Sett](
-         libraryDependencies <++= scalaVersion.apply(sv => Seq(
-           "org.scala-lang" % "scala-reflect" % sv
-         ) ++ depend.testing())
+         libraryDependencies ++= Seq(
+           "org.scala-lang" % "scala-reflect" % scalaVersion.value
+         ) ++ depend.testing()
        , addCompilerPlugin(depend.macroParadise())
     )
   ).dependsOn(core)
@@ -156,10 +150,8 @@ object build extends Build {
         ++ depend.hadoop()
         ++ depend.parquet()
         ++ depend.testing()
-        ++ Seq(
-          "au.com.cba.omnia" %% "thermometer-hive" % thermometerVersion % "test"
-        ),
-      dependencyOverrides += "org.scalacheck" %% "scalacheck" % "1.11.4",
+        ++ depend.omnia("omnitool-core", omnitoolVersion, "test").map(_ classifier "tests")
+        ++ depend.omnia("thermometer-hive", thermometerVersion, "test"),
       parallelExecution in Test := false
     )
   ).dependsOn(core % "compile->compile;test->test")
@@ -172,12 +164,11 @@ object build extends Build {
     ++ uniform.project("maestro-schema", "au.com.cba.omnia.maestro.schema")
     ++ uniformAssemblySettings
     ++ Seq[Sett](
-          libraryDependencies <++= scalaVersion.apply(sv => Seq(
+          libraryDependencies ++= Seq(
             "com.quantifind"         %% "sumac"                    % "0.3.0"
-          , "org.scala-lang"         %  "scala-reflect"            % sv
+          , "org.scala-lang"         %  "scala-reflect"            % scalaVersion.value
           , "org.apache.commons"     %  "commons-lang3"            % "3.1"
-          , "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4"
-          ) ++ depend.scalding() ++ depend.hadoopClasspath ++ depend.hadoop())
+          ) ++ depend.scalding() ++ depend.hadoopClasspath ++ depend.hadoop()
        )
     )
 
@@ -190,9 +181,8 @@ object build extends Build {
     ++ uniformAssemblySettings
     ++ uniformThriftSettings
     ++ Seq[Sett](
-         libraryDependencies ++= depend.hadoopClasspath ++ depend.hadoop() ++ depend.parquet() ++ Seq(
-           scalikejdbc % "test"
-         )
+         libraryDependencies ++= depend.hadoopClasspath ++ depend.hadoop() ++ depend.parquet() ++
+           depend.scalikejdbc().map(_.copy(configurations = Some("test")))
        , parallelExecution in Test := false
        , sources in doc in Compile := List()
        , addCompilerPlugin(depend.macroParadise())
@@ -232,11 +222,10 @@ object build extends Build {
     ++ uniformThriftSettings
     ++ humbugSettings
     ++ Seq[Sett](
-         scroogeThriftSourceFolder in Compile <<= (sourceDirectory) { _ / "main" / "thrift" / "scrooge" }
-       , humbugThriftSourceFolder  in Compile <<= (sourceDirectory) { _ / "main" / "thrift" / "humbug" }
+         scroogeThriftSourceFolder in Compile := sourceDirectory.value / "main" / "thrift" / "scrooge"
+       , humbugThriftSourceFolder  in Compile := sourceDirectory.value / "main" / "thrift" / "humbug"
        , libraryDependencies ++=
            depend.omnia("ebenezer-test",    ebenezerVersion)
-           ++ depend.omnia("thermometer-hive", thermometerVersion)
            ++ depend.hadoopClasspath ++ depend.hadoop()
            ++ depend.testing(configuration = "test")
     )

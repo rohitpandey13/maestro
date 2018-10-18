@@ -16,7 +16,7 @@ package au.com.cba.omnia.maestro.core.validate
 
 import org.scalacheck.Arbitrary
 
-import au.com.cba.omnia.omnitool.{Result, Ok}
+import au.com.cba.omnia.omnitool.Result
 
 import au.com.cba.omnia.maestro.core.data.Field
 import au.com.cba.omnia.maestro.core.test.Spec

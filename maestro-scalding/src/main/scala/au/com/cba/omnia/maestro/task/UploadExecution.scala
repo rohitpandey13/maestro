@@ -18,9 +18,9 @@ import java.io.{BufferedReader, FileReader, File}
 
 import scala.util.matching.Regex
 
-import org.slf4j.{Logger, LoggerFactory}
+import org.slf4j.LoggerFactory
 
-import org.joda.time.{DateTime, DateTimeZone, Period}
+import org.joda.time.{DateTimeZone, Period}
 
 import org.apache.commons.io.input.ReversedLinesFileReader
 
@@ -29,7 +29,6 @@ import com.twitter.scalding._
 import au.com.cba.omnia.omnitool.Result
 
 import au.com.cba.omnia.maestro.core.upload._
-import au.com.cba.omnia.maestro.scalding.ConfHelper
 import au.com.cba.omnia.maestro.scalding.ExecutionOps._
 
 /** Information about an upload */

@@ -21,26 +21,21 @@ import java.io.File
 
 import org.apache.commons.lang.StringUtils
 
-import org.slf4j.{Logger, LoggerFactory}
+import org.slf4j.LoggerFactory
 
 import scalaz.Monoid
 
-import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.io.compress.{GzipCodec, CompressionCodec}
-
-import cascading.flow.FlowDef
 
 import com.twitter.scalding._
 
 import com.cba.omnia.edge.source.compressible.CompressibleTypedTsv
 
-import au.com.cba.omnia.parlour.SqoopSyntax.{ParlourExportDsl, ParlourImportDsl}
 import au.com.cba.omnia.parlour.{SqoopExecution => ParlourExecution, ParlourExportOptions, ParlourImportOptions, ParlourOptions}
 
 import au.com.cba.omnia.permafrost.hdfs.Hdfs
 
 import au.com.cba.omnia.maestro.core.codec.Encode
-import au.com.cba.omnia.maestro.core.split.Splitter
 import au.com.cba.omnia.maestro.scalding.StatKeys
 import au.com.cba.omnia.maestro.scalding.ExecutionOps._
 

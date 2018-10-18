@@ -23,8 +23,6 @@ import org.apache.commons.lang.WordUtils
 
 import com.twitter.scrooge.ThriftStruct
 
-import au.com.cba.omnia.humbug.HumbugThriftStruct
-
 import au.com.cba.omnia.maestro.core.transform.Join
 
 /**

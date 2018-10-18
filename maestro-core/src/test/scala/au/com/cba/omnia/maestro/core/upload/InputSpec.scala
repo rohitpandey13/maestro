@@ -22,7 +22,7 @@ import java.io.File
 
 import org.joda.time.{DateTime, DateTimeZone, Period}, DateTimeZone.UTC
 
-import au.com.cba.omnia.omnitool.{Result, Ok, Error}
+import au.com.cba.omnia.omnitool.{Ok, Error}
 
 class InputSpec extends Specification with ThrownExpectations { def is = s2"""
 

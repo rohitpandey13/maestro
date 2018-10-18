@@ -15,7 +15,7 @@
 package au.com.cba.omnia.maestro.core.codec
 
 import scala.util.control.NonFatal
-import scala.reflect.runtime.universe.{typeOf, TypeTag, WeakTypeTag}
+import scala.reflect.runtime.universe.{typeOf, TypeTag}
 
 import scalaz._, Scalaz._, \&/._
 

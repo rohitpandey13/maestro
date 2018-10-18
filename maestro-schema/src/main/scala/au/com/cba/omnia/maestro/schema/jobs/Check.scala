@@ -14,8 +14,6 @@
 package au.com.cba.omnia.maestro.schema
 package jobs
 
-import scala.io.Source
-
 import org.apache.commons.lang.StringEscapeUtils._
 
 import com.twitter.scalding._

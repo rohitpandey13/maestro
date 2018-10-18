@@ -15,10 +15,8 @@
 package au.com.cba.omnia.maestro.macros
 
 import scala.annotation.StaticAnnotation
-import scala.reflect.macros.TypecheckException
 import scala.reflect.macros.whitebox.Context
 import scala.language.experimental.macros
-import scala.collection.immutable.StringOps
 
 import scalaz.Scalaz._
 import scalaz.NonEmptyList

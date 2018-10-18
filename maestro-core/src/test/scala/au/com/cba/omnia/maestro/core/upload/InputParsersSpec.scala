@@ -20,9 +20,7 @@ import org.joda.time.{DateTime, DateTimeZone, Period}
 import org.specs2.Specification
 import org.specs2.matcher.ThrownExpectations
 
-import java.io.File
-
-import au.com.cba.omnia.omnitool.{Result, Ok, Error}
+import au.com.cba.omnia.omnitool.{Ok, Error}
 
 
 class InputParsersSpec extends Specification with ThrownExpectations { def is = s2"""
