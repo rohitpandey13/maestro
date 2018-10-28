@@ -14,10 +14,12 @@
 
 package au.com.cba.omnia.maestro.task
 
-import java.util.UUID
-
 import scala.util.Failure
 import scala.io.Source
+
+import java.io.File
+import java.nio.file.Files
+import java.util.UUID
 
 import scalikejdbc.{SQL, ConnectionPool, AutoSession}
 
@@ -42,6 +44,7 @@ object SqoopExportExecutionSpec
   Fails if sqlQuery set and need to delete all existing rows $endToEndExportWithQuery
   Fails with Teradata connection manager                     $endToEndExportWithTeradataConnMan
   Succeeds with Teradata after connection manager reset      $endToEndExportWithTeradataResetConnMan
+  Succeeds if the export dir is empty                        $endToEndExportWithNoFiles
   Export pipe                                                $endToEndExportPipe
 
 """
@@ -50,6 +53,7 @@ object SqoopExportExecutionSpec
   val password         = ""
   val mapRedHome       = s"${System.getProperty("user.home")}/.ivy2/cache"
   val exportDir        = s"$dir/user/sales/books/customers/export"
+  val exportDirEmpty   = s"$dir/user/sales/books/customers/empty-dir"
   val resourceUrl      = getClass.getResource("/sqoop")
   val newCustomers     = Source.fromFile(s"${resourceUrl.getPath}/sales/books/customers/export/new-customers.txt").getLines().toList
   val oldCustomers     = Source.fromFile(s"${resourceUrl.getPath}/sales/books/customers/old-customers.txt").getLines().toList
@@ -102,9 +106,10 @@ object SqoopExportExecutionSpec
       val config = SqoopExportConfig(
         options(table).sqlQuery(s"select * from $table"), deleteFromTable = true
       )
-      execute(sqoopExport(config, exportDir)) must throwA[RuntimeException](
-        message = "SqoopOptions.getSqlQuery must be empty on Sqoop Export with delete from table"
-      )
+      execute(sqoopExport(config, exportDir)) must beLike {
+        case Failure(ex: RuntimeException) =>
+          ex.getMessage mustEqual "SqoopOptions.getSqlQuery must be empty on Sqoop Export with delete from table"
+      }
     }
   }
 
@@ -132,6 +137,18 @@ object SqoopExportExecutionSpec
       val config = SqoopExportConfig(TeradataOptions(table))
       executesOk(sqoopExport(config, exportDir))
       tableData(connectionString, username, password, table) must containTheSameElementsAs(newCustomers)
+    }
+  }
+
+  def endToEndExportWithNoFiles = {
+    val table = s"customer_export_${UUID.randomUUID.toString.replace('-', '_')}".toUpperCase
+    tableSetup(connectionString, username, password, table)
+
+    withEnvironment(path(resourceUrl.toString)) {
+      Files.createDirectory(new File(exportDirEmpty).toPath)
+      val config = SqoopExportConfig(options(table))
+      executesOk(sqoopExport(config, exportDirEmpty))
+      tableData(connectionString, username, password, table) must containTheSameElementsAs(List())
     }
   }
 

@@ -21,7 +21,7 @@ import java.io.File
 
 import org.apache.commons.lang.StringUtils
 
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
 
 import scalaz.Monoid
 
@@ -38,7 +38,6 @@ import au.com.cba.omnia.permafrost.hdfs.Hdfs
 import au.com.cba.omnia.maestro.core.codec.Encode
 import au.com.cba.omnia.maestro.scalding.StatKeys
 import au.com.cba.omnia.maestro.scalding.ExecutionOps._
-
 
 /**
   * Configuration options for sqoop import
@@ -147,8 +146,6 @@ object SqoopExportConfig {
     * @param username:         Database username
     * @param password:         Database password
     * @param dbTablename:      Table name in database
-    * @param exportDir:        Optional directory to export from, if known in advance.
-    *                          Not specified by default.
     * @param inputFieldsTerminatedBy: Output field terminating character.
     *                          Defaults to '|'
     * @param inputNullString:  The string to be written for a null value in columns.
@@ -174,6 +171,8 @@ object SqoopExportConfig {
 
 /** Methods to import and export from sqoop */
 trait SqoopExecution {
+  private lazy val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
   /**
     * Runs a sqoop import from a database table to HDFS.
     *
@@ -194,11 +193,16 @@ trait SqoopExecution {
   ): Execution[(String, Long)] =
     SqoopEx.importExecution(config)
 
-  /** Exports data from HDFS to a DB via Sqoop. */
+  /** Exports data from HDFS to a DB via Sqoop (unless export dir contains no files, then this is a no-op). */
   def sqoopExport[T <: ParlourExportOptions[T]](
     config: SqoopExportConfig[T], exportDir: String
-  ): Execution[Unit] =
-    SqoopEx.exportExecution(config.copy(options = config.options.exportDir(exportDir)))
+  ): Execution[Unit] = for {
+    fileList <- Execution.fromHdfs(Hdfs.files(Hdfs.path(exportDir)))
+    _        <- fileList.size match {
+                  case 0 => Execution.from(logger.info(s"Sqoop export operation skipped due to empty dir: $exportDir"))
+                  case _ => SqoopEx.exportExecution(config.copy(options = config.options.exportDir(exportDir)))
+                }
+  } yield ()
 
   /** Exports data from a TypedPipe to a DB via Sqoop.
     *
@@ -217,7 +221,7 @@ trait SqoopExecution {
                  .map(_.mkString(sep))
                  .writeExecution(TypedPsv(dir.toString))
         _   <- sqoopExport(config, dir.toString)
-        _   <- Execution.fromHdfs{ Hdfs.delete(dir, true) }
+        _   <- Execution.fromHdfs{ Hdfs.delete(dir, recDelete = true) }
       } yield ()
   }
 }
