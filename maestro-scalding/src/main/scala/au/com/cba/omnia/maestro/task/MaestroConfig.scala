@@ -69,6 +69,8 @@ case class MaestroConfig(
   lazy val connString      = args("jdbc")
   lazy val username        = args("db-user")
   lazy val password        = Option(System.getenv("DBPASSWORD")).getOrElse("")
+  lazy val envInputPrefix  = args("env-input-prefix") //This is used to the env prefix for new layers like DIL/ENR etc
+  lazy val envOutputPrefix = args("env-output-prefix")
 
   /**
     * Produce an upload config for this job using standard paths.
