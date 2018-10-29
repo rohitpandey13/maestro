@@ -18,6 +18,7 @@ import scala.util.Random
 import scala.reflect.{ClassTag, classTag}
 
 import java.io.File
+import java.sql.DriverManager
 
 import org.apache.commons.lang.StringUtils
 
@@ -30,6 +31,8 @@ import org.apache.hadoop.io.compress.{GzipCodec, CompressionCodec}
 import com.twitter.scalding._
 
 import com.cba.omnia.edge.source.compressible.CompressibleTypedTsv
+
+import au.com.cba.omnia.omnitool.Result
 
 import au.com.cba.omnia.parlour.{SqoopExecution => ParlourExecution, ParlourExportOptions, ParlourImportOptions, ParlourOptions}
 
@@ -196,13 +199,8 @@ trait SqoopExecution {
   /** Exports data from HDFS to a DB via Sqoop (unless export dir contains no files, then this is a no-op). */
   def sqoopExport[T <: ParlourExportOptions[T]](
     config: SqoopExportConfig[T], exportDir: String
-  ): Execution[Unit] = for {
-    fileList <- Execution.fromHdfs(Hdfs.files(Hdfs.path(exportDir)))
-    _        <- fileList.size match {
-                  case 0 => Execution.from(logger.info(s"Sqoop export operation skipped due to empty dir: $exportDir"))
-                  case _ => SqoopEx.exportExecution(config.copy(options = config.options.exportDir(exportDir)))
-                }
-  } yield ()
+  ): Execution[Unit] =
+    SqoopEx.exportExecution(config.copy(options = config.options.exportDir(exportDir)))
 
   /** Exports data from a TypedPipe to a DB via Sqoop.
     *
@@ -262,6 +260,8 @@ case class QuerySrc(query: String, splitBy: Option[String]) extends ImportSource
   * We may change this without considering backwards compatibility.
   */
 object SqoopEx {
+  private lazy val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
   // system property key for setting custom hadoop map reduce dir
   // this property is a hack to get testing working without impacting our API
   val mrHomeKey  = "MAESTRO_HADOOP_MAPRED_HOME"
@@ -311,14 +311,52 @@ object SqoopEx {
 
   def exportExecution[T <: ParlourExportOptions[T]](
     config: SqoopExportConfig[T]
-  ): Execution[Unit] = {
-    val withDelete    =
-      if (config.deleteFromTable) trySetDeleteQuery(config.options)
-      else config.options
-    val withMRHome    = setCustomMRHome(withDelete)
-    val withClassName = withMRHome.getClassName.fold(withMRHome.className(f"SqoopExport_${Random.nextInt(Int.MaxValue)}%010d"))(_ => withMRHome)
-    val withConnMan   = getCustomConnMan.fold(withClassName)(withClassName.connectionManager(_))
-    ParlourExecution.sqoopExport(withConnMan)
+  ): Execution[Unit] = for {
+    exportDir     <- config.options.getExportDir match {
+                       case Some(dir) => Execution.from(dir)
+                       case None      => Execution.fail("Export dir must be set")
+                     }
+    fileList      <- Execution.fromHdfs(Hdfs.files(Hdfs.path(exportDir)))
+    withDelete    <- if (config.deleteFromTable)
+                       Execution.from(trySetDeleteQuery(config.options))
+                     else
+                       Execution.from(config.options)
+    _             <- fileList.size match {
+                       case 0 => {
+                         logger.info(s"Export dir is empty so no sqoop export will occur: $exportDir")
+                         Execution.fromResult(deleteDestinationTable(withDelete))
+                       }
+                       case _ => for {
+                         withMRHome    <- Execution.from(setCustomMRHome(withDelete))
+                         withClassName  = withMRHome.getClassName.fold(
+                                            withMRHome.className(f"SqoopExport_${Random.nextInt(Int.MaxValue)}%010d")
+                                          )(_ => withMRHome)
+                         withConnMan    = getCustomConnMan.fold(withClassName)(withClassName.connectionManager(_))
+                         _             <- ParlourExecution.sqoopExport(withConnMan)
+                       } yield ()
+                     }
+  } yield ()
+
+  /** Typically the Sqoop application will perform remote table deletion prior to sqoop. However there is an issue with
+    * executing sqoop when the export directory is empty. In this case, we manually invoke the deletion script. */
+  private def deleteDestinationTable[T <: ParlourExportOptions[T]](
+    config: ParlourOptions[T]
+  ): Result[Unit] = config.getSqlQuery match {
+      case None        => Result.ok(())
+      case Some(query) => for {
+                            connStr  <- Result.safe(config.getConnectionString.get).addMessage("Get connection string")
+                            username <- Result.safe(config.getUsername.get).addMessage("Get username")
+                            password  = config.getPassword.getOrElse("")
+                            _        <- config.getDriver.fold(Result.ok(())) { driverClass =>
+                                          logger.debug(s"Initialising driver: $driverClass")
+                                          Result.safe(Class.forName(driverClass)).map(_ => ())
+                                        }.addMessage(s"Initialise driver: driverClass")
+                            _        <- Result.safe(DriverManager.getConnection(connStr, username, password))
+                                          .bracket(conn => Result.safe(conn.close())) { conn =>
+                                            logger.info(s"Deleting destination table: $query")
+                                            Result.safe(conn.createStatement().executeQuery(query))
+                                          }.addMessage(s"Delete destination table: $query")
+                          } yield ()
   }
 
   // Sets DELETE sql query. Throws RuntimeException if sql query already set or table name is not set

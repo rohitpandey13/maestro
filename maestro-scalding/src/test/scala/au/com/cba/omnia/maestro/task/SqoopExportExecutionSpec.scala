@@ -45,6 +45,7 @@ object SqoopExportExecutionSpec
   Fails with Teradata connection manager                     $endToEndExportWithTeradataConnMan
   Succeeds with Teradata after connection manager reset      $endToEndExportWithTeradataResetConnMan
   Succeeds if the export dir is empty                        $endToEndExportWithNoFiles
+  Executes 'delete table' even if export dir empty           $deleteFromTableExportWithNoFiles
   Export pipe                                                $endToEndExportPipe
 
 """
@@ -151,6 +152,19 @@ object SqoopExportExecutionSpec
       tableData(connectionString, username, password, table) must containTheSameElementsAs(List())
     }
   }
+
+  def deleteFromTableExportWithNoFiles = {
+    val table = s"customer_export_${UUID.randomUUID.toString.replace('-', '_')}".toUpperCase
+    tableSetup(connectionString, username, password, table, Option(oldCustomers))
+
+    withEnvironment(path(resourceUrl.toString)) {
+      Files.createDirectory(new File(exportDirEmpty).toPath)
+      val config = SqoopExportConfig(options(table), deleteFromTable = true)
+      executesOk(sqoopExport(config, exportDirEmpty))
+      tableData(connectionString, username, password, table) must containTheSameElementsAs(List())
+    }
+  }
+
 
   def tableSetup(
     connectionString: String,
