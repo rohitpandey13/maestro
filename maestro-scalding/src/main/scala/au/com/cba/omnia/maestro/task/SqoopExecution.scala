@@ -196,7 +196,10 @@ trait SqoopExecution {
   ): Execution[(String, Long)] =
     SqoopEx.importExecution(config)
 
-  /** Exports data from HDFS to a DB via Sqoop (unless export dir contains no files, then this is a no-op). */
+  /** Exports data from HDFS to a DB via Sqoop.
+    *
+    * If the export dir is empty, the sqoop will not be triggered, however the dest table will still be deleted if
+    * configured to do so. */
   def sqoopExport[T <: ParlourExportOptions[T]](
     config: SqoopExportConfig[T], exportDir: String
   ): Execution[Unit] =
@@ -316,17 +319,16 @@ object SqoopEx {
                        case Some(dir) => Execution.from(dir)
                        case None      => Execution.fail("Export dir must be set")
                      }
-    fileList      <- Execution.fromHdfs(Hdfs.files(Hdfs.path(exportDir)))
     withDelete    <- if (config.deleteFromTable)
                        Execution.from(trySetDeleteQuery(config.options))
                      else
                        Execution.from(config.options)
-    _             <- fileList.size match {
-                       case 0 => {
-                         logger.info(s"Export dir is empty so no sqoop export will occur: $exportDir")
-                         Execution.fromResult(deleteDestinationTable(withDelete))
-                       }
-                       case _ => for {
+    fileList      <- Execution.fromHdfs(Hdfs.files(Hdfs.path(exportDir)))
+    _             <- if (fileList.isEmpty) {
+                       logger.info(s"Export dir is empty so no sqoop export will occur: $exportDir")
+                       Execution.fromResult(deleteDestinationTable(withDelete))
+                     } else {
+                       for {
                          withMRHome    <- Execution.from(setCustomMRHome(withDelete))
                          withClassName  = withMRHome.getClassName.fold(
                                             withMRHome.className(f"SqoopExport_${Random.nextInt(Int.MaxValue)}%010d")
@@ -347,10 +349,10 @@ object SqoopEx {
                             connStr  <- Result.safe(config.getConnectionString.get).addMessage("Get connection string")
                             username <- Result.safe(config.getUsername.get).addMessage("Get username")
                             password  = config.getPassword.getOrElse("")
-                            _        <- config.getDriver.fold(Result.ok(())) { driverClass =>
+                            _        <- Result.safe { config.getDriver.foreach { driverClass =>
                                           logger.debug(s"Initialising driver: $driverClass")
-                                          Result.safe(Class.forName(driverClass)).map(_ => ())
-                                        }.addMessage(s"Initialise driver: driverClass")
+                                          Class.forName(driverClass)
+                                        }}.addMessage(s"Initialise driver: driverClass")
                             _        <- Result.safe(DriverManager.getConnection(connStr, username, password))
                                           .bracket(conn => Result.safe(conn.close())) { conn =>
                                             logger.info(s"Deleting destination table: $query")
