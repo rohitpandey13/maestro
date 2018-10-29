@@ -312,37 +312,42 @@ object SqoopEx {
     execution.withSubConfig(modifyConfig)
   }
 
+  /** Exports data from HDFS to a DB via Sqoop.
+    *
+    * If the export dir is empty, the sqoop will not be triggered, however the dest table will still be deleted if
+    * configured to do so. */
   def exportExecution[T <: ParlourExportOptions[T]](
     config: SqoopExportConfig[T]
-  ): Execution[Unit] = for {
-    exportDir     <- config.options.getExportDir match {
-                       case Some(dir) => Execution.from(dir)
-                       case None      => Execution.fail("Export dir must be set")
-                     }
-    withDelete    <- if (config.deleteFromTable)
-                       Execution.from(trySetDeleteQuery(config.options))
-                     else
-                       Execution.from(config.options)
-    fileList      <- Execution.fromHdfs(Hdfs.files(Hdfs.path(exportDir)))
-    _             <- if (fileList.isEmpty) {
-                       logger.info(s"Export dir is empty so no sqoop export will occur: $exportDir")
-                       Execution.fromResult(deleteDestinationTable(withDelete))
-                     } else {
-                       for {
-                         withMRHome    <- Execution.from(setCustomMRHome(withDelete))
-                         withClassName  = withMRHome.getClassName.fold(
-                                            withMRHome.className(f"SqoopExport_${Random.nextInt(Int.MaxValue)}%010d")
-                                          )(_ => withMRHome)
-                         withConnMan    = getCustomConnMan.fold(withClassName)(withClassName.connectionManager(_))
-                         _             <- ParlourExecution.sqoopExport(withConnMan)
-                       } yield ()
-                     }
-  } yield ()
+  ): Execution[Unit] = {
+    val withDelete =
+      if (config.deleteFromTable) trySetDeleteQuery(config.options)
+      else config.options
+    for {
+      exportDir <- config.options.getExportDir.fold(Execution.fail[String]("Export dir must be set"))(Execution.from(_))
+      fileList  <- Execution.fromHdfs(Hdfs.files(Hdfs.path(exportDir)))
+      _         <- if (fileList.nonEmpty) {
+                     performSqoopExport(withDelete)
+                   } else {
+                     logger.info(s"Export dir is empty so no sqoop export will occur: $exportDir")
+                     Execution.fromResult(deleteDestinationTable(withDelete))
+                   }
+    } yield ()
+  }
+
+  /** Run the sqoop export operation. */
+  private def performSqoopExport[T <: ParlourExportOptions[T]](
+    config: ParlourExportOptions[T]
+  ): Execution[Unit] = {
+    val withMRHome    = setCustomMRHome(config)
+    val withClassName = withMRHome.getClassName.fold[ParlourExportOptions[T]](withMRHome.className(f"SqoopExport_${Random.nextInt(Int.MaxValue)}%010d"))(_ => withMRHome)
+    val withConnMan   = getCustomConnMan.fold(withClassName)(withClassName.connectionManager(_))
+    ParlourExecution.sqoopExport(withConnMan)
+  }
 
   /** Typically the Sqoop application will perform remote table deletion prior to sqoop. However there is an issue with
-    * executing sqoop when the export directory is empty. In this case, we manually invoke the deletion script. */
+    * executing sqoop when the export directory is empty. In this case, we manually invoke the deletion command. */
   private def deleteDestinationTable[T <: ParlourExportOptions[T]](
-    config: ParlourOptions[T]
+    config: ParlourExportOptions[T]
   ): Result[Unit] = config.getSqlQuery match {
       case None        => Result.ok(())
       case Some(query) => for {

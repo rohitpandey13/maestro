@@ -107,10 +107,9 @@ object SqoopExportExecutionSpec
       val config = SqoopExportConfig(
         options(table).sqlQuery(s"select * from $table"), deleteFromTable = true
       )
-      execute(sqoopExport(config, exportDir)) must beLike {
-        case Failure(ex: RuntimeException) =>
-          ex.getMessage mustEqual "SqoopOptions.getSqlQuery must be empty on Sqoop Export with delete from table"
-      }
+      execute(sqoopExport(config, exportDir)) must throwA[RuntimeException](
+        message = "SqoopOptions.getSqlQuery must be empty on Sqoop Export with delete from table"
+      )
     }
   }
 
