@@ -34,14 +34,14 @@ import au.com.cba.omnia.humbug.HumbugSBT._
 object build extends Build {
   type Sett = Def.Setting[_]
 
-  val thermometerVersion = "1.6.9-20181018060930-b772548"
-  val ebenezerVersion    = "0.24.7-20181018101621-01c6c4e"
-  val beeswaxVersion     = "0.2.8-20181018094106-acfac52"
-  val omnitoolVersion    = "1.15.7-20181018075855-52b83f2"
-  val permafrostVersion  = "0.15.7-20181018094021-b7cc383"
-  val edgeVersion        = "3.8.7-20181018101154-c430468"
-  val humbugVersion      = "0.8.6-20181018060744-194b719"
-  val parlourVersion     = "1.13.7-20181018064500-8e684f3"
+  val thermometerVersion = "1.6.10-20190225131441-be82ab7"
+  val ebenezerVersion    = "0.24.8-20190310174013-ab54bd4"
+  val beeswaxVersion     = "0.2.9-20190310163217-7677164"
+  val omnitoolVersion    = "1.15.8-20190310152130-00578df"
+  val permafrostVersion  = "0.15.8-20190310163117-ca25070"
+  val edgeVersion        = "3.8.8-20190310174050-3ad51ac"
+  val humbugVersion      = "0.8.7-20190306212707-48e6182"
+  val parlourVersion     = "1.13.8-20190310152246-3026f34"
 
   lazy val standardSettings: Seq[Sett] =
     Defaults.coreDefaultSettings ++
