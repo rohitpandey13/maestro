@@ -81,7 +81,7 @@ case class RichExecutionObject(exec: Execution.type) extends ResultantOps[Execut
     val stacktrace = Thread.currentThread.getStackTrace.tail
 
     Execution.getConfig.flatMap { config =>
-      val hiveConf = new HiveConf(ConfHelper.getHadoopConf(config), this.getClass)
+      val hiveConf = new HiveConf(ConfHelper.getHiveConf(config), this.getClass)
       modifyConf(hiveConf)
       Execution.fromFuture[T] { _ =>
         val result = hive.run(hiveConf).addMessage("Hive Operation failed")
