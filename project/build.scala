@@ -39,7 +39,7 @@ object build extends Build {
   val beeswaxVersion     = "0.2.11-20190730083634-78faba5"
   val omnitoolVersion    = "1.15.9-20190730073144-b52646c"
   val permafrostVersion  = "0.15.9-20190730083617-8bb13bc"
-  val edgeVersion        = "3.8.8-20190310174050-3ad51ac"
+  val edgeVersion        = "3.8.9-20190730094133-4be8b98"
   val humbugVersion      = "0.8.8-20190730062733-7025390"
   val parlourVersion     = "1.14.2-20190730073214-152deaa"
 
