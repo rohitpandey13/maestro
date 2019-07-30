@@ -41,7 +41,7 @@ object build extends Build {
   val permafrostVersion  = "0.15.8-20190310163117-ca25070"
   val edgeVersion        = "3.8.8-20190310174050-3ad51ac"
   val humbugVersion      = "0.8.7-20190306212707-48e6182"
-  val parlourVersion     = "1.13.8-20190310152246-3026f34"
+  val parlourVersion     = "1.14.0-20190730012817-2f8925e"
 
   lazy val standardSettings: Seq[Sett] =
     Defaults.coreDefaultSettings ++
